@@ -119,7 +119,7 @@ namespace LabMichael
             var host = Dns.GetHostEntry(Dns.GetHostName());
             foreach (var ip in host.AddressList)
             {
-                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                if (ip.AddressFamily == AddressFamily.InterNetwork && ip.ToString()!="127.0.0.1")
                 {
                     return ip.ToString();
                 }
@@ -203,15 +203,16 @@ namespace LabMichael
 
             /*-----------------------------------------------------------------------*/
 
-            IPEndPoint sender = new IPEndPoint(IPAddress.Any, 80);
-            IPEndPoint broadcast = new IPEndPoint(IPAddress.Broadcast, 80);
+            int token = 1488;
+            int port = 1035;
+            IPEndPoint sender = new IPEndPoint(IPAddress.Any, port);
+            IPEndPoint broadcast = new IPEndPoint(IPAddress.Broadcast, port);
             List<string> ip_list = new List<string>();
             string my_ip = GetLocalIPAddress();
-
-            int token = 1488;
+            Console.WriteLine($"My ip: {my_ip}");
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             socket.EnableBroadcast = true;
-            socket.Bind(new IPEndPoint(IPAddress.Parse(GetLocalIPAddress()), 80));
+            socket.Bind(new IPEndPoint(IPAddress.Any, port));
 
             Console.WriteLine("Done - Server started");
 
@@ -227,7 +228,7 @@ namespace LabMichael
                     string sender_ip = ((IPEndPoint)(senderRemote)).Address.ToString();
                     string mess = Encoding.ASCII.GetString(data, 0, bytes);
 
-                    if (sender_ip != GetLocalIPAddress())
+                    if (sender_ip != my_ip)
                     {
                         Console.WriteLine($"Info - Recieve from {sender_ip} {mess.Length} bytes");
                         if (ip_list.Contains(sender_ip))
@@ -267,7 +268,7 @@ namespace LabMichael
             Task.Run(() => {
                 while(ip_list.Count==0)
                 { Thread.Sleep(30); }
-                IPEndPoint sender1 = new IPEndPoint(IPAddress.Parse(ip_list[0]), 80);
+                IPEndPoint sender1 = new IPEndPoint(IPAddress.Parse(ip_list[0]), port);
                 while (true)
                 {
                     ChangeObj change;
@@ -281,11 +282,11 @@ namespace LabMichael
                 }
             });
             Thread.Sleep(5000);
-            socket.SendTo(Encoding.ASCII.GetBytes(token.ToString(), 0, token.ToString().Length),broadcast);
-            Console.WriteLine($"Info - Sent to {broadcast.Address}: {token.ToString()}");
+            socket.SendTo(Encoding.ASCII.GetBytes(token.ToString(), 0, token.ToString().Length),(EndPoint)broadcast);
+            Console.WriteLine($"Info - Sent to {broadcast.Address}: {token}");
             /*-----------------------------------------------------------------------*/
             Console.WriteLine("Press 'q' to quit the sample.");
-            while (Console.Read() != 'q') ;
+            while (Console.Read() != 'q');
         }
 
     }
