@@ -192,8 +192,7 @@ namespace LabMichael
         }
         static void Main(string[] args)
         {
-
-            FileSystemWatcher fsw = new FileSystemWatcher(@".\trent");
+            FileSystemWatcher fsw = new FileSystemWatcher(@"../../../test");
             fsw.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite |
             NotifyFilters.FileName | NotifyFilters.DirectoryName;
             Subscribe(fsw);
@@ -208,19 +207,18 @@ namespace LabMichael
             int token = 1488;
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             socket.EnableBroadcast = true;
-            socket.Bind(new IPEndPoint(IPAddress.Parse("192.168.0.100"), 80));
+            socket.Bind(new IPEndPoint(IPAddress.Parse(GetLocalIPAddress()), 80));
 
             Console.WriteLine("Done - Server started");
 
 
+            EndPoint senderRemote = (EndPoint)sender;
 
             Task.Run(() => {
                 int bytes = 0;
                 byte[] data = new byte[5200];
-                EndPoint senderRemote;
                 while (true)
                 {
-                    senderRemote = (EndPoint)sender;
                     bytes = socket.ReceiveFrom(data, 0, ref senderRemote);
                     string sender_ip = ((IPEndPoint)(senderRemote)).Address.ToString();
                     string mess = Encoding.ASCII.GetString(data, 0, bytes);
@@ -252,7 +250,6 @@ namespace LabMichael
 
                 while (true)
                 {
-
                     ChangeObj change;
                     while (!receiveQueue.TryDequeue(out change))
                     {
@@ -264,7 +261,9 @@ namespace LabMichael
                 }
             });
             Task.Run(() => {
-                IPEndPoint sender1 = new IPEndPoint(IPAddress.Parse("192.168.0.104"), 80);
+                while(ip_list.Count==0)
+                { Thread.Sleep(30); }
+                IPEndPoint sender1 = new IPEndPoint(IPAddress.Parse(ip_list[0]), 80);
                 while (true)
                 {
                     ChangeObj change;
@@ -277,8 +276,8 @@ namespace LabMichael
                     Console.WriteLine($"Info-Send To { sender1.Address}");
                 }
             });
-            Thread.Sleep(4000);
-            socket.SendTo(Encoding.ASCII.GetBytes(token.ToString(), 0, token.ToString().Length), new IPEndPoint(IPAddress.Parse("192.168.0.104"), 80));
+            Thread.Sleep(5000);
+            socket.SendTo(Encoding.ASCII.GetBytes(token.ToString(), 0, token.ToString().Length), new IPEndPoint(IPAddress.Broadcast, 80));
             Console.WriteLine($"Info - Sent to broadcast: {token.ToString()}");
             /*-----------------------------------------------------------------------*/
             Console.WriteLine("Press 'q' to quit the sample.");
