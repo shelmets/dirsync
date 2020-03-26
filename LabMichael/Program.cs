@@ -48,20 +48,29 @@ namespace LabMichael
         }
         private void Delete()
         {
+            bool flag = true;
             if (fileType == FileType.File)
             {
 
                 if (File.Exists(path))
                 {
                     File.Delete(path);
+                    Console.WriteLine("Info - Delete {0} {1}", (fileType == FileType.File) ? "file" : "dir", path);
                 }
+                else
+                    flag = false;
             }
             else
             {
                 if (Directory.Exists(path))
                     Directory.Delete(path, true);
+                else
+                    flag = false;
             }
-            Console.WriteLine("Info - Delete {0} {1}", (fileType == FileType.File) ? "file" : "dir", path);
+            if (flag)
+                Console.WriteLine("Info - Delete {0} {1}", (fileType == FileType.File) ? "file" : "dir", path);
+            else
+                Console.WriteLine("Warning - {0} {1} dont exist!", (fileType == FileType.File) ? "file" : "dir", path);
         }
         private void Create()
         {
