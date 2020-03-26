@@ -22,7 +22,7 @@ namespace LabMichael
 
     class ChangeObj
     {
-        public readonly static int Size = 20000;
+        public readonly static int Size = 100000;
         public FileType fileType { get; set; }
         public WatcherChangeTypes type { get; set; }
         public string path { get; set; }
@@ -249,7 +249,7 @@ namespace LabMichael
 
             Task.Run(() => {
                 int bytes = 0;
-                byte[] data = new byte[20000];
+                byte[] data = new byte[ChangeObj.Size];
                 while (true)
                 {
                     bytes = socket.ReceiveFrom(data, 0, ref senderRemote);
@@ -296,7 +296,7 @@ namespace LabMichael
             });
             Task.Run(() => {
                 while(ip_list.Count==0)
-                { Thread.Sleep(30); }
+                { Thread.Sleep(2); }
                 IPEndPoint sender1 = new IPEndPoint(IPAddress.Parse(ip_list[0]), port);
                 while (true)
                 {
