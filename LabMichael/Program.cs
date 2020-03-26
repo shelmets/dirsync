@@ -307,7 +307,7 @@ namespace LabMichael
                     }
                     string mess = $"Change\r\n{JsonSerializer.Serialize<ChangeObj>(change)}";
                     socket.SendTo(Encoding.ASCII.GetBytes(mess, 0, mess.Length), (EndPoint)sender1);
-                    Console.WriteLine($"Info - Send To { sender1.Address}");
+                    Console.WriteLine($"Info - Send To { sender1.Address} {mess.Length} bytes");
                 }
             });
             Console.WriteLine("Wait 7 sec...");
