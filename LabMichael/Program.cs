@@ -204,6 +204,7 @@ namespace LabMichael
             /*-----------------------------------------------------------------------*/
 
             IPEndPoint sender = new IPEndPoint(IPAddress.Any, 80);
+            IPEndPoint broadcast = new IPEndPoint(IPAddress.Broadcast, 80);
             List<string> ip_list = new List<string>();
             string my_ip = GetLocalIPAddress();
 
@@ -280,8 +281,8 @@ namespace LabMichael
                 }
             });
             Thread.Sleep(5000);
-            socket.SendTo(Encoding.ASCII.GetBytes(token.ToString(), 0, token.ToString().Length), new IPEndPoint(IPAddress.Broadcast, 80));
-            Console.WriteLine($"Info - Sent to broadcast: {token.ToString()}");
+            socket.SendTo(Encoding.ASCII.GetBytes(token.ToString(), 0, token.ToString().Length),broadcast);
+            Console.WriteLine($"Info - Sent to {broadcast.Address}: {token.ToString()}");
             /*-----------------------------------------------------------------------*/
             Console.WriteLine("Press 'q' to quit the sample.");
             while (Console.Read() != 'q') ;
