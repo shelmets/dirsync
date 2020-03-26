@@ -149,28 +149,32 @@ namespace LabMichael
             ChangeObj change = null;
             WatcherChangeTypes wct = e.ChangeType;
             byte[] b;
-            switch (wct)
+            Regex regex = new Regex(@".*\.DS_Store");
+            if (!regex.IsMatch(e.FullPath))
             {
-                case WatcherChangeTypes.Created:
-                case WatcherChangeTypes.Deleted:
-                    change = new ChangeObj() { fileType = (!Directory.Exists(e.FullPath)) ? FileType.File : FileType.Dir, type = wct, path = e.FullPath, body = new byte[1], bytes = 0 };
-                    break;
-                case WatcherChangeTypes.Changed:
-                    if (!Directory.Exists(e.FullPath))
-                    {
-                        b = new byte[ChangeObj.Size];
-                        int count;
-                        using (FileStream fs = File.OpenRead(e.FullPath))
+                switch (wct)
+                {
+                    case WatcherChangeTypes.Created:
+                    case WatcherChangeTypes.Deleted:
+                        change = new ChangeObj() { fileType = (!Directory.Exists(e.FullPath)) ? FileType.File : FileType.Dir, type = wct, path = e.FullPath, body = new byte[1], bytes = 0 };
+                        break;
+                    case WatcherChangeTypes.Changed:
+                        if (!Directory.Exists(e.FullPath))
                         {
-                            UTF8Encoding temp = new UTF8Encoding(true);
-                            count = fs.Read(b, 0, ChangeObj.Size);
+                            b = new byte[ChangeObj.Size];
+                            int count;
+                            using (FileStream fs = File.OpenRead(e.FullPath))
+                            {
+                                UTF8Encoding temp = new UTF8Encoding(true);
+                                count = fs.Read(b, 0, ChangeObj.Size);
+                            }
+                            change = new ChangeObj() { fileType = FileType.File, type = wct, path = e.FullPath, body = b, bytes = count };
                         }
-                        change = new ChangeObj() { fileType = FileType.File, type = wct, path = e.FullPath, body = b, bytes = count };
-                    }
-                    break;
+                        break;
+                }
+                Console.WriteLine("{0} {1} {2}", e.FullPath, (!Directory.Exists(e.FullPath)) ? "file" : "dir", wct.ToString());
+                sendQueue.Enqueue(change);
             }
-            Console.WriteLine("{0} {1} {2}", e.FullPath,(!Directory.Exists(e.FullPath)) ? "file" : "dir", wct.ToString());
-            sendQueue.Enqueue(change);
         }
         static void OnRenamed(object source, RenamedEventArgs e)
         {
