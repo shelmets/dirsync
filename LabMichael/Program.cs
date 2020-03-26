@@ -272,6 +272,7 @@ namespace LabMichael
                             {
                                 Console.WriteLine($"Info - {sender_ip} saved");
                                 ip_list.Add(sender_ip);
+                                socket.SendTo(Encoding.ASCII.GetBytes(token.ToString(), 0, token.ToString().Length), senderRemote);
                             }
                         }
 
@@ -310,8 +311,6 @@ namespace LabMichael
                     Console.WriteLine($"Info - Send To { sender1.Address} {mess.Length} bytes");
                 }
             });
-            Console.WriteLine("Wait 7 sec...");
-            Thread.Sleep(7000);
             socket.SendTo(Encoding.ASCII.GetBytes(token.ToString(), 0, token.ToString().Length),(EndPoint)broadcast);
             Console.WriteLine($"Info - Sent to {broadcast.Address}: {token}");
             /*-----------------------------------------------------------------------*/
