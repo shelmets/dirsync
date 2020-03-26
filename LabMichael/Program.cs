@@ -192,6 +192,9 @@ namespace LabMichael
         }
         static void Main(string[] args)
         {
+            if (!Directory.Exists(@"../../../test"))
+                Directory.CreateDirectory(@"../../../test");
+
             FileSystemWatcher fsw = new FileSystemWatcher(@"../../../test");
             fsw.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite |
             NotifyFilters.FileName | NotifyFilters.DirectoryName;
