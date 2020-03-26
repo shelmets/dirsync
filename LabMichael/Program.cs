@@ -55,7 +55,6 @@ namespace LabMichael
                 if (File.Exists(path))
                 {
                     File.Delete(path);
-                    Console.WriteLine("Info - Delete {0} {1}", (fileType == FileType.File) ? "file" : "dir", path);
                 }
                 else
                     flag = false;
@@ -180,14 +179,14 @@ namespace LabMichael
                     }
                     break;
             }
-            Console.WriteLine($"{e.FullPath} {wct}");
+            Console.WriteLine("{0} {1} {2}", e.FullPath,(!Directory.Exists(e.FullPath)) ? "file" : "dir", wct.ToString());
             sendQueue.Enqueue(change);
         }
         static void OnRenamed(object source, RenamedEventArgs e)
         {
             // Show that a file has been renamed.
             WatcherChangeTypes wct = e.ChangeType;
-            Console.WriteLine("{2} from {0} to {1}", e.OldFullPath, e.FullPath, wct.ToString());
+            Console.WriteLine("Renamed {2} from {0} to {1}", e.OldFullPath, e.FullPath, (!Directory.Exists(e.FullPath)) ? "file" : "dir");
             ChangeObj change = new ChangeObj() { fileType = (!Directory.Exists(e.FullPath)) ? FileType.File : FileType.Dir, type = wct, path = e.OldFullPath, body = Encoding.ASCII.GetBytes(e.FullPath), bytes = e.FullPath.Length };
             sendQueue.Enqueue(change);
         }
