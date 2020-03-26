@@ -22,7 +22,7 @@ namespace LabMichael
 
     class ChangeObj
     {
-        public readonly static int Size = 4096;
+        public readonly static int Size = 20000;
         public FileType fileType { get; set; }
         public WatcherChangeTypes type { get; set; }
         public string path { get; set; }
@@ -159,7 +159,7 @@ namespace LabMichael
                         change = new ChangeObj() { fileType = (!Directory.Exists(e.FullPath)) ? FileType.File : FileType.Dir, type = wct, path = e.FullPath, body = new byte[1], bytes = 0 };
                         break;
                     case WatcherChangeTypes.Changed:
-                        if (!Directory.Exists(e.FullPath))
+                        if (File.Exists(e.FullPath))
                         {
                             b = new byte[ChangeObj.Size];
                             int count;
@@ -249,7 +249,7 @@ namespace LabMichael
 
             Task.Run(() => {
                 int bytes = 0;
-                byte[] data = new byte[5200];
+                byte[] data = new byte[20000];
                 while (true)
                 {
                     bytes = socket.ReceiveFrom(data, 0, ref senderRemote);
@@ -307,7 +307,7 @@ namespace LabMichael
                     }
                     string mess = $"Change\r\n{JsonSerializer.Serialize<ChangeObj>(change)}";
                     socket.SendTo(Encoding.ASCII.GetBytes(mess, 0, mess.Length), (EndPoint)sender1);
-                    Console.WriteLine($"Info-Send To { sender1.Address}");
+                    Console.WriteLine($"Info - Send To { sender1.Address}");
                 }
             });
             Console.WriteLine("Wait 7 sec...");
