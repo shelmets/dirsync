@@ -287,7 +287,7 @@ namespace LabMichael
                     ChangeObj change;
                     while (!receiveQueue.TryDequeue(out change))
                     {
-                        Thread.Sleep(2);
+                        Thread.Sleep(20);
                     }
                     Unsubscribe(fsw);
                     change.path = GetRightPath(change.path);
@@ -299,12 +299,12 @@ namespace LabMichael
                 while(ip_list.Count==0)
                 { Thread.Sleep(2); }
                 IPEndPoint sender1 = new IPEndPoint(IPAddress.Parse(ip_list[0]), port);
+                ChangeObj change;
                 while (true)
                 {
-                    ChangeObj change;
                     while (!sendQueue.TryDequeue(out change))
                     {
-                        Thread.Sleep(2);
+                        Thread.Sleep(20);
                     }
                     string mess = $"Change\r\n{JsonSerializer.Serialize<ChangeObj>(change)}";
                     socket.SendTo(Encoding.ASCII.GetBytes(mess, 0, mess.Length), (EndPoint)sender1);
