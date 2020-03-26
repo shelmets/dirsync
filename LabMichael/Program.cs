@@ -22,7 +22,7 @@ namespace LabMichael
 
     class ChangeObj
     {
-        public readonly static int Size = 20;
+        public readonly static int Size = 9000;
         public FileType fileType { get; set; }
         public WatcherChangeTypes type { get; set; }
         public string path { get; set; }
@@ -251,7 +251,7 @@ namespace LabMichael
 
             Task.Run(() => {
                 int bytes = 0;
-                byte[] data = new byte[5200];
+                byte[] data = new byte[15000];
                 while (true)
                 {
                     bytes = socket.ReceiveFrom(data, 0, ref senderRemote);
