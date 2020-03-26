@@ -22,7 +22,7 @@ namespace LabMichael
 
     class ChangeObj
     {
-        public readonly static int Size = 9000;
+        public readonly static int Size = 100;
         public FileType fileType { get; set; }
         public WatcherChangeTypes type { get; set; }
         public string path { get; set; }
