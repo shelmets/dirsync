@@ -102,7 +102,9 @@ namespace LabMichael
         {
             if (fileType == FileType.File)
             {
-                using (FileStream fs = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.Write))
+                if (File.Exists(path))
+                    File.Delete(path);
+                using (FileStream fs = File.OpenWrite(path))
                 {
                     fs.Write(body, 0, bytes);
                 }
