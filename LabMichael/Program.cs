@@ -84,19 +84,21 @@ namespace LabMichael
         }
         private void Rename()
         {
+            string new_path = Program.GetRightPath(Encoding.ASCII.GetString(body, 0, bytes));
+            
             if (fileType == FileType.File)
             {
                 if (File.Exists(path))
                 {
-                    File.Move(path, Encoding.ASCII.GetString(body, 0, bytes));
+                    File.Move(path, new_path);
                 }
             }
             else
             {
                 if (Directory.Exists(path))
-                    Directory.Move(path, Encoding.ASCII.GetString(body, 0, bytes));
+                    Directory.Move(path, new_path);
             }
-            Console.WriteLine("Info - Rename {0} {1}", (fileType == FileType.File) ? "file" : "dir", path);
+            Console.WriteLine("Info - Rename {0} {1} to {2}", (fileType == FileType.File) ? "file" : "dir", path, new_path);
         }
         private void Update()
         {
@@ -135,6 +137,14 @@ namespace LabMichael
                                                .IsOSPlatform(os))
                     return os;
             return new OSPlatform();
+        }
+        public static string GetRightPath(string path)
+        {
+            if (GetOSPlatform() == OSPlatform.Windows)
+                path = path.Replace("/", @"\");
+            else
+                path = path.Replace(@"\", "/");
+            return path;
         }
         static void OnChanged(object source, FileSystemEventArgs e)
         {
@@ -277,10 +287,7 @@ namespace LabMichael
                         Thread.Sleep(2);
                     }
                     Unsubscribe(fsw);
-                    if (os == OSPlatform.Windows)
-                        change.path = change.path.Replace("/",@"\");
-                    else
-                        change.path = change.path.Replace(@"\", "/");
+                    change.path = GetRightPath(change.path);
                     change.Do();
                     Subscribe(fsw);
                 }
