@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Runtime.InteropServices;
 
 namespace LabMichael
 {
@@ -126,6 +127,15 @@ namespace LabMichael
             }
             throw new Exception("No network adapters with an IPv4 address in the system!");
         }
+        public static OSPlatform GetOSPlatform()
+        {
+            OSPlatform[] list = new OSPlatform[4] { OSPlatform.Linux, OSPlatform.Windows, OSPlatform.OSX, OSPlatform.FreeBSD };
+            foreach (var os in list)
+                if (System.Runtime.InteropServices.RuntimeInformation
+                                               .IsOSPlatform(os))
+                    return os;
+            return new OSPlatform();
+        }
         static void OnChanged(object source, FileSystemEventArgs e)
         {
             ChangeObj change = null;
@@ -192,10 +202,20 @@ namespace LabMichael
         }
         static void Main(string[] args)
         {
-            if (!Directory.Exists(@"../../../test"))
-                Directory.CreateDirectory(@"../../../test");
+            int token = 1488;
+            int port = 1035;
+            string my_ip = GetLocalIPAddress();
+            OSPlatform os = GetOSPlatform();
+            Console.WriteLine(os);
+            Console.WriteLine($"My ip: {my_ip}");
+            string path = @"../../../test";
+            if(os==OSPlatform.Windows)
+                path.Replace("/",@"\");
 
-            FileSystemWatcher fsw = new FileSystemWatcher(@"../../../test");
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
+            FileSystemWatcher fsw = new FileSystemWatcher(path);
             fsw.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite |
             NotifyFilters.FileName | NotifyFilters.DirectoryName;
             Subscribe(fsw);
@@ -203,13 +223,9 @@ namespace LabMichael
 
             /*-----------------------------------------------------------------------*/
 
-            int token = 1488;
-            int port = 1035;
             IPEndPoint sender = new IPEndPoint(IPAddress.Any, port);
             IPEndPoint broadcast = new IPEndPoint(IPAddress.Broadcast, port);
             List<string> ip_list = new List<string>();
-            string my_ip = GetLocalIPAddress();
-            Console.WriteLine($"My ip: {my_ip}");
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             socket.EnableBroadcast = true;
             socket.Bind(new IPEndPoint(IPAddress.Any, port));
@@ -261,6 +277,10 @@ namespace LabMichael
                         Thread.Sleep(2);
                     }
                     Unsubscribe(fsw);
+                    if (os == OSPlatform.Windows)
+                        change.path = change.path.Replace("/",@"\");
+                    else
+                        change.path = change.path.Replace(@"\", "/");
                     change.Do();
                     Subscribe(fsw);
                 }
